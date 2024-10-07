@@ -3,9 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:wifi_iot/wifi_iot.dart';
+
+import 'in_app_web_view_screen.dart';
 
 class ConnectDeviceScreen extends StatefulWidget {
   const ConnectDeviceScreen({super.key});
@@ -16,7 +16,7 @@ class ConnectDeviceScreen extends StatefulWidget {
 
 class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
   List<WifiNetwork> _wifiList = [];
-  bool _isLoading = true;  // 로딩 상태를 나타내는 변수
+  bool _isLoading = true;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -27,42 +27,43 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
 
   Future<void> _loadWifiList() async {
     setState(() {
-      _isLoading = true;  // 로딩 상태로 변경
+      _isLoading = true;
     });
 
     try {
       List<WifiNetwork>? networks = await WiFiForIoTPlugin.loadWifiList();
       setState(() {
         _wifiList = networks ?? [];
-        _isLoading = false;  // Wi-Fi 목록 로딩 완료 시 로딩 상태 해제
+        _isLoading = false;
       });
     } catch (e) {
       print("Wi-Fi 목록 로드 중 오류 발생: $e");
       setState(() {
-        _isLoading = false;  // 오류 발생 시에도 로딩 상태 해제
+        _isLoading = false;
       });
     }
   }
 
   Future<void> _connectToWifi(String ssid) async {
     try {
-      if (ssid == "AtoZ_LAB") {
-        bool isConnected = await WiFiForIoTPlugin.connect(ssid,
-            password: "atoz9897!",
-            joinOnce: true,
-            withInternet: true,
-            security: NetworkSecurity.WPA); // WPA 보안 방식 사용
+      if (ssid == "FARM_AP") {
+        bool isConnected = await WiFiForIoTPlugin.connect(
+          ssid,
+          password: "12345678",
+          joinOnce: true,
+          withInternet: true,
+          security: NetworkSecurity.WPA,
+        );
 
         if (isConnected) {
           print("Wi-Fi 연결 성공: $ssid");
-          _launchURL('192.168.0.1');
+          _launchInAppBrowser('http://192.168.0.1');  // 인앱 브라우저로 열기
         } else {
           print("Wi-Fi 연결 실패");
         }
       } else {
         bool isConnected = await WiFiForIoTPlugin.connect(ssid,
-            joinOnce: true,
-            withInternet: true);
+            joinOnce: true, withInternet: true);
         if (isConnected) {
           print("Wi-Fi 연결 성공: $ssid");
         } else {
@@ -74,14 +75,8 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
     }
   }
 
-  void _launchURL(String url) async {
-    final formattedUrl = url.startsWith('http') ? url : 'http://$url';
-
-    if (await canLaunch(formattedUrl)) {
-      await launch(formattedUrl);
-    } else {
-      throw 'Could not launch $formattedUrl';
-    }
+  void _launchInAppBrowser(String url) {
+    Get.to(() => InAppWebViewScreen(url: url));
   }
 
   void _showExitDialog() {
@@ -118,7 +113,7 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,  // GlobalKey 추가
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: const Text('AtoZ System'),
@@ -143,7 +138,6 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
       ),
       body: Column(
         children: [
-          // 입체적인 "연결 가능한 디바이스 목록" 부분
           Container(
             padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
@@ -172,7 +166,7 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
           Expanded(
             child: _isLoading
                 ? const Center(
-              child: CircularProgressIndicator(),  // 로딩 중일 때 로딩 인디케이터 표시
+              child: CircularProgressIndicator(),
             )
                 : _wifiList.isEmpty
                 ? const Center(
@@ -188,8 +182,8 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
                     onPressed: () => _connectToWifi(ssid),
                     child: const Text('연결'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // 버튼 배경색을 파란색으로 설정
-                      foregroundColor: Colors.white,  // 글자색
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
                     ),
                   ),
                 );
@@ -198,7 +192,7 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
           ),
         ],
       ),
-      endDrawer: Drawer(  // EndDrawer로 변경
+      endDrawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
@@ -219,15 +213,15 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
               title: const Text('설정'),
               onTap: () {
                 Navigator.pop(context);
-                Get.to(() => const SettingScreen());// 드로어 닫기
+                Get.to(() => const SettingScreen());
               },
             ),
             ListTile(
               leading: const Icon(Icons.exit_to_app),
               title: const Text('종료'),
               onTap: () {
-                Get.back(); // 드로어 닫기
-                _showExitDialog(); // 종료 다이얼로그 열기
+                Get.back();
+                _showExitDialog();
               },
             ),
           ],
@@ -236,3 +230,8 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
     );
   }
 }
+
+
+
+
+
