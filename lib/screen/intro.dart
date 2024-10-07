@@ -28,19 +28,22 @@ class _IntroState extends State<Intro> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,  // 위아래 여백 생성
         children: [
           Spacer(),  // 상단 여백
-          Text(
-            'Farmsonic System',
-            style: TextStyle(
-              fontSize: 33,
-              fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic
+          Padding(
+            padding: const EdgeInsets.only(top: 60),
+            child: Text(
+              'Farmsonic System',
+              style: TextStyle(
+                fontSize: 33,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic
+              ),
             ),
           ),
           Spacer(),  // 중앙에 텍스트를 배치하기 위해 Spacer 사용
           Align(
             alignment: Alignment.bottomCenter,  // 이미지 하단 중앙 정렬
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 30),  // 하단에 약간의 여백 추가
+              padding: const EdgeInsets.only(bottom: 20),  // 하단에 약간의 여백 추가
               child: Image.asset(
                 'assets/인트로로고.png',
                 width: 150,
