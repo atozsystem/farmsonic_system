@@ -40,6 +40,8 @@ dependencies:
   url_launcher: ^6.3.0
   webview_flutter: ^4.9.0
   get: ^4.6.6
+  flutter_inappwebview: ^6.1.4
+  fluttertoast: ^8.2.8
 
 dev_dependencies:
   flutter_test:
