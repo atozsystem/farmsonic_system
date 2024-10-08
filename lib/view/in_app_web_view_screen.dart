@@ -10,7 +10,8 @@ class InAppWebViewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('인앱 브라우저'),
+        centerTitle: true,
+        title: const Text('AtoZ System'),
         backgroundColor: Colors.blue,
       ),
       body: InAppWebView(

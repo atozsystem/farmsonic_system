@@ -1,4 +1,4 @@
-import 'package:farmsonic_system/screen/setting.dart';
+import 'package:farmsonic_system/view/setting.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +46,8 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
 
   Future<void> _connectToWifi(String ssid) async {
     try {
+      _showSnackbarMessage("연결 중입니다..."); // 연결 중 Snackbar 메시지 표시
+
       if (ssid == "FARM_AP") {
         bool isConnected = await WiFiForIoTPlugin.connect(
           ssid,
@@ -56,23 +58,65 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
         );
 
         if (isConnected) {
-          print("Wi-Fi 연결 성공: $ssid");
+          print("연결 성공: $ssid");
+          _showSnackbarMessage("Wi-Fi 연결 성공!"); // 연결 성공 Snackbar 메시지 표시
           _launchInAppBrowser('http://192.168.0.1');  // 인앱 브라우저로 열기
         } else {
-          print("Wi-Fi 연결 실패");
+          print("연결 실패");
+          _showReconnectDialog(ssid); // 연결 실패 시 재연결 여부 묻는 다이얼로그 표시
         }
       } else {
         bool isConnected = await WiFiForIoTPlugin.connect(ssid,
             joinOnce: true, withInternet: true);
         if (isConnected) {
-          print("Wi-Fi 연결 성공: $ssid");
+          print("연결 성공: $ssid");
+          _showSnackbarMessage("연결 성공!"); // 연결 성공 Snackbar 메시지 표시
         } else {
-          print("Wi-Fi 연결 실패");
+          print("연결 실패");
+          _showReconnectDialog(ssid); // 연결 실패 시 재연결 여부 묻는 다이얼로그 표시
         }
       }
     } catch (e) {
-      print("Wi-Fi 연결 중 오류 발생: $e");
+      print("연결 중 오류 발생: $e");
+      _showReconnectDialog(ssid); // 오류 발생 시에도 재연결 여부 묻는 다이얼로그 표시
     }
+  }
+
+  void _showReconnectDialog(String ssid) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("연결 실패"),
+          content: const Text("연결에 실패했습니다. 다시 시도하시겠습니까?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("아니오"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("예"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _connectToWifi(ssid); // 재연결 시도
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSnackbarMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.black,
+      ),
+    );
   }
 
   void _launchInAppBrowser(String url) {
@@ -129,9 +173,9 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.menu, size: 30,color: Colors.black,),
+            icon: const Icon(Icons.menu, size: 30, color: Colors.black,),
             onPressed: () {
-              _scaffoldKey.currentState?.openEndDrawer();  // EndDrawer 열기
+              _scaffoldKey.currentState?.openEndDrawer();
             },
           ),
         ],
@@ -143,7 +187,7 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
             decoration: BoxDecoration(
               color: Colors.lightBlue[50],
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black26,
                   offset: Offset(2, 2),
@@ -153,16 +197,16 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
+              children: const [
+                Text(
                   "연결 가능한 디바이스 목록",
                   style: TextStyle(fontSize: 18),
                 ),
-                const Icon(Icons.wifi),
+                Icon(Icons.wifi),
               ],
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Expanded(
             child: _isLoading
                 ? const Center(
@@ -230,8 +274,3 @@ class _ConnectDeviceScreenState extends State<ConnectDeviceScreen> {
     );
   }
 }
-
-
-
-
-
