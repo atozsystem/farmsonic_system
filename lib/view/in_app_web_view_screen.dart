@@ -1,3 +1,4 @@
+import 'package:farmsonic_system/view/connect_device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -52,13 +53,18 @@ class InAppWebViewScreen extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                minimumSize: const Size(90, 35),
                 backgroundColor: Colors.blue, // 버튼 배경색 (파란색)
                 padding: const EdgeInsets.symmetric(vertical: 16.0), // 버튼 패딩
                 textStyle: const TextStyle(fontSize: 15),
               ),
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('공장 초기화', style: TextStyle(color: Colors.white)),
+                child: Text('공장 초기화', style: TextStyle(color: Colors.white)
+                ),
               ),
             ),
           ),
@@ -81,11 +87,19 @@ class InAppWebViewScreen extends StatelessWidget {
               ),
             ),
             ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("홈"),
+              onTap: () {
+                Get.back();
+                Get.to(ConnectDeviceScreen());
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('설정'),
               onTap: () {
-                Navigator.pop(context);
-                Get.to(() => const SettingScreen());
+                Get.back();
+                Get.to(SettingScreen());
               },
             ),
             ListTile(
@@ -93,7 +107,7 @@ class InAppWebViewScreen extends StatelessWidget {
               title: const Text('종료'),
               onTap: () {
                 Get.back();
-                _showExitDialog(context);
+                _showExitDialog();
               },
             ),
           ],
@@ -102,30 +116,28 @@ class InAppWebViewScreen extends StatelessWidget {
     );
   }
 
-  void _showExitDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("종료"),
-          content: const Text("앱을 종료하시겠습니까?"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("아니오"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text("예"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                SystemNavigator.pop();
-              },
-            ),
-          ],
-        );
-      },
+  void _showExitDialog() {
+    Get.defaultDialog(
+      title: "종료",
+      content: const Text("앱을 종료하시겠습니까?"),
+      actions: <Widget>[
+        TextButton(
+          child: const Text("아니오"),
+          onPressed: () {
+            Get.back(); // 다이얼로그 닫기
+          },
+        ),
+        TextButton(
+          child: const Text("예"),
+          onPressed: () {
+            Get.back(); // 다이얼로그 닫기
+            _exitApp(); // 앱 종료 함수 호출
+          },
+        ),
+      ],
     );
+  }
+  void _exitApp() {
+    SystemNavigator.pop(); // 앱 종료
   }
 }

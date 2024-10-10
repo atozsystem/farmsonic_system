@@ -1,3 +1,4 @@
+import 'package:farmsonic_system/view/connect_device.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';  // Get 패키지를 사용하기 위해 추가
@@ -151,7 +152,11 @@ class _SettingScreenState extends State<SettingScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
+
             ),
           ],
         ),
@@ -171,6 +176,14 @@ class _SettingScreenState extends State<SettingScreen> {
                   fontSize: 25,
                 ),
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("홈"),
+              onTap: () {
+                Navigator.pop(context);
+                Get.to(() => ConnectDeviceScreen());
+              },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
